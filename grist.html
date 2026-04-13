@@ -1,2 +1,71 @@
 <!DOCTYPE html>
-<h1>Test Grist</h1>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-6">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h3 class="text-slate-500 text-sm font-medium uppercase">Total Contacts</h3>
+      <p id="count-contacts" class="text-3xl font-bold text-blue-600 mt-2">--</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h3 class="text-slate-500 text-sm font-medium uppercase">Total Partenaires</h3>
+      <p id="count-partenaires" class="text-3xl font-bold text-green-600 mt-2">--</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+      <h2 class="font-bold text-slate-700">Aperçu du Dashboard One-Pager</h2>
+    </div>
+    <div id="display-area" class="p-6 text-slate-600">
+      Chargement des données...
+    </div>
+  </div>
+
+  <script>
+    async function initDashboard() {
+      // 1. Connexion à Grist
+      grist.ready({ requiredAccess: 'read table' });
+
+      try {
+        // 2. Récupération parallèle des deux tables
+        // Note : Remplacez 'CONTACT' et 'PARTENAIRES' par les ID réels si différent
+        const contacts = await grist.docApi.fetchTable('CONTACT');
+        const partenaires = await grist.docApi.fetchTable('PARTENAIRES');
+
+        // 3. Mise à jour des indicateurs (KPI)
+        // Les données arrivent sous forme d'objet de colonnes { Prénom: [], Nom: []... }
+        // On prend la longueur du premier tableau de colonnes
+        const nbContacts = contacts.id.length;
+        const nbPartenaires = partenaires.id.length;
+
+        document.getElementById('count-contacts').innerText = nbContacts;
+        document.getElementById('count-partenaires').innerText = nbPartenaires;
+
+        // 4. Affichage d'une petite liste simple
+        let html = '<ul class="divide-y divide-slate-100">';
+        for (let i = 0; i < Math.min(nbContacts, 10); i++) {
+          html += `<li class="py-2">
+            <strong>${contacts.Prénom[i]} ${contacts.Nom[i]}</strong> 
+            <span class="text-slate-400"> - ${contacts.email[i]}</span>
+          </li>`;
+        }
+        html += '</ul>';
+        
+        document.getElementById('display-area').innerHTML = html;
+
+      } catch (err) {
+        document.getElementById('display-area').innerHTML = 
+          `<p class="text-red-500">Erreur : ${err.message}. <br>Vérifiez que les IDs de table sont 'CONTACT' et 'PARTENAIRES'.</p>`;
+      }
+    }
+
+    initDashboard();
+  </script>
+</body>
+</html>
