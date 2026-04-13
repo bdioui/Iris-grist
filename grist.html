@@ -35,8 +35,8 @@
       try {
         // 2. Récupération parallèle des deux tables
         // Note : Remplacez 'CONTACT' et 'PARTENAIRES' par les ID réels si différent
-        const contacts = await grist.docApi.fetchTable('CONTACT');
-        const partenaires = await grist.docApi.fetchTable('PARTENAIRES');
+        const contacts = await grist.docApi.fetchTable('Contact');
+        const partenaires = await grist.docApi.fetchTable('Partenaires');
 
         // 3. Mise à jour des indicateurs (KPI)
         // Les données arrivent sous forme d'objet de colonnes { Prénom: [], Nom: []... }
